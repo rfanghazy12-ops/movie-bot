@@ -1,4 +1,4 @@
-from pyrogram import Client, filters, idle
+from pyrogram import Client, filters
 import yt_dlp, asyncio, os
 
 API_ID = int(os.environ.get("API_ID"))
@@ -20,25 +20,22 @@ def download_video(query):
             info = info['entries'][0]
         return ydl.prepare_filename(info)
 
-@app.on_message(filters.command("شغل") & filters.group)
+@app.on_message(filters.command("شغل"))
 async def play_movie(client, message):
     if len(message.command) < 2:
-        await message.reply("❌ اكتب اسم الفيلم\nمثال: /شغل اسم")
+        await message.reply("❌ اكتب اسم الفيلم\nمثال: /شغل avengers")
         return
     query = " ".join(message.command[1:])
     msg = await message.reply(f"🔍 جاري البحث: {query}")
     try:
         await msg.edit("⬇️ جاري التحميل...")
         video_file = download_video(query)
-        await msg.edit(f"✅ تم تحميل: {query}\n\nأرسل الفيديو للمجموعة...")
+        await msg.edit("📤 جاري الإرسال...")
         await app.send_video(message.chat.id, video_file, caption=f"🎬 {query}")
         os.remove(video_file)
+        await msg.delete()
     except Exception as e:
         await msg.edit(f"❌ خطأ: {str(e)}")
 
-async def main():
-    await app.start()
-    print("✅ البوت يعمل!")
-    await idle()
-
-asyncio.run(main())
+print("✅ البوت يعمل!")
+app.run()

@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-import yt_dlp, asyncio, os
+import yt_dlp, os
 
 API_ID = int(os.environ.get("API_ID"))
 API_HASH = os.environ.get("API_HASH")
@@ -12,6 +12,12 @@ def download_video(query):
         'format': 'best[ext=mp4]/best',
         'outtmpl': 'movie.%(ext)s',
         'noplaylist': True,
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+        'extractor_args': {
+            'youtube': {'skip': ['dash', 'hls']}
+        },
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         url = query if query.startswith("http") else f"ytsearch1:{query}"
